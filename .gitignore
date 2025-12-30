@@ -1,0 +1,97 @@
+# -------------------------------------------------------
+# Python
+# -------------------------------------------------------
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pyd
+*.pkl
+*.pdb
+
+# virtual environments
+venv/
+.env/
+.venv/
+
+# Ignore environment variables file
+*.env
+
+# local database files (SQLite)
+*.db
+*.sqlite
+*.sqlite3
+
+# pytest cache
+.pytest_cache/
+.cache/
+
+# mypy
+.mypy_cache/
+
+# coverage
+.coverage
+htmlcov/
+coverage.xml
+
+# Jupyter (por si te da por usar cuadernos 😄)
+.ipynb_checkpoints/
+
+# -------------------------------------------------------
+# FastAPI / Uvicorn / Logs
+# -------------------------------------------------------
+logs/
+*.log
+
+# -------------------------------------------------------
+# IDEs
+# -------------------------------------------------------
+# VSCode
+.vscode/
+
+# PyCharm
+.idea/
+
+# -------------------------------------------------------
+# Build / Dist files
+# -------------------------------------------------------
+build/
+dist/
+*.egg-info/
+
+# -------------------------------------------------------
+# Docker
+# -------------------------------------------------------
+# Ignore Docker compose local overrides
+docker-compose.override.yml
+
+# Docker build folders
+**/docker-build/
+**/tmp/
+
+# -------------------------------------------------------
+# OS generated files
+# -------------------------------------------------------
+.DS_Store
+Thumbs.db
+
+# -------------------------------------------------------
+# Security-sensitive files
+# -------------------------------------------------------
+# AWS credentials (NEVER commit these)
+.aws/
+*.pem
+*.key
+*.crt
+
+# -------------------------------------------------------
+# Project-specific ignores
+# -------------------------------------------------------
+# Generated schema/output files
+schema_postgres.sql
+data_clean.sql
+output/
+temp/
+
+# Token files
+*.token
