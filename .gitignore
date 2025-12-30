@@ -9,6 +9,12 @@ __pycache__/
 *.pkl
 *.pdb
 
+# Excluir completamente __pycache__
+__pycache__/
+**/__pycache__/
+*/__pycache__/
+
+
 # virtual environments
 venv/
 .env/
