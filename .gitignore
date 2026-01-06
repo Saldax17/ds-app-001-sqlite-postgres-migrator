@@ -1,46 +1,42 @@
 # -------------------------------------------------------
 # Python
 # -------------------------------------------------------
+
+# Byte-compiled / optimized / DLL files
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
-*.pyd
-*.pkl
-*.pdb
+*.py[cod]
+*$py.class
 
-# Excluir completamente __pycache__
-__pycache__/
-**/__pycache__/
-*/__pycache__/
-
-
-# virtual environments
+# -------------------------------------------------------
+# Virtual environments
+# -------------------------------------------------------
 venv/
 .env/
 .venv/
 
-# Ignore environment variables file
+# Environment variables
 *.env
 
-# local database files (SQLite)
+# -------------------------------------------------------
+# Local database files (SQLite)
+# -------------------------------------------------------
 *.db
 *.sqlite
 *.sqlite3
 
-# pytest cache
+# -------------------------------------------------------
+# Testing / tooling
+# -------------------------------------------------------
 .pytest_cache/
 .cache/
-
-# mypy
 .mypy_cache/
 
-# coverage
+# Coverage
 .coverage
 htmlcov/
 coverage.xml
 
-# Jupyter (por si te da por usar cuadernos 😄)
+# Jupyter
 .ipynb_checkpoints/
 
 # -------------------------------------------------------
@@ -52,14 +48,11 @@ logs/
 # -------------------------------------------------------
 # IDEs
 # -------------------------------------------------------
-# VSCode
 .vscode/
-
-# PyCharm
 .idea/
 
 # -------------------------------------------------------
-# Build / Dist files
+# Build / Dist
 # -------------------------------------------------------
 build/
 dist/
@@ -68,15 +61,12 @@ dist/
 # -------------------------------------------------------
 # Docker
 # -------------------------------------------------------
-# Ignore Docker compose local overrides
 docker-compose.override.yml
-
-# Docker build folders
 **/docker-build/
 **/tmp/
 
 # -------------------------------------------------------
-# OS generated files
+# OS files
 # -------------------------------------------------------
 .DS_Store
 Thumbs.db
@@ -84,20 +74,16 @@ Thumbs.db
 # -------------------------------------------------------
 # Security-sensitive files
 # -------------------------------------------------------
-# AWS credentials (NEVER commit these)
 .aws/
 *.pem
 *.key
 *.crt
+*.token
 
 # -------------------------------------------------------
-# Project-specific ignores
+# Project-specific
 # -------------------------------------------------------
-# Generated schema/output files
 schema_postgres.sql
 data_clean.sql
 output/
 temp/
-
-# Token files
-*.token

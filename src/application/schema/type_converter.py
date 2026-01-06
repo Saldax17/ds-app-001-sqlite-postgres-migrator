@@ -1,5 +1,4 @@
 class TypeConverter:
-
     SQLITE_TO_PG = {
         "INTEGER": "BIGINT",
         "INT": "BIGINT",
@@ -12,14 +11,17 @@ class TypeConverter:
         "DATE": "DATE",
     }
 
-    # default fallback
     DEFAULT_TYPE = "TEXT"
 
-    def map_sqlite_to_pg(self, sqlite_type: str) -> str:
+    @staticmethod
+    def sqlite_to_postgres(sqlite_type: str) -> str:
+        if not sqlite_type:
+            return TypeConverter.DEFAULT_TYPE
+
         sqlite_type = sqlite_type.upper()
 
-        for key in self.SQLITE_TO_PG:
+        for key, pg_type in TypeConverter.SQLITE_TO_PG.items():
             if key in sqlite_type:
-                return self.SQLITE_TO_PG[key]
+                return pg_type
 
-        return self.DEFAULT_TYPE
+        return TypeConverter.DEFAULT_TYPE

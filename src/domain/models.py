@@ -1,12 +1,9 @@
 from enum import Enum
-from pydantic import BaseModel, Field
 from datetime import datetime
-from typing import Optional, Dict, List
+from typing import List, Optional
+from pydantic import BaseModel, Field
 
 
-# ==============================================
-# JOB STATUS
-# ==============================================
 class JobStatus(str, Enum):
     PENDING = "PENDING"
     RUNNING = "RUNNING"
@@ -15,70 +12,34 @@ class JobStatus(str, Enum):
     CANCELLED = "CANCELLED"
 
 
-# ==============================================
-# REQUEST MODELS
-# ==============================================
-class GenerateSchemaRequest(BaseModel):
-    sqlite_path: str
-
-
-class ApplySchemaRequest(BaseModel):
-    postgres_url: str
-    schema_sql: str
-
-
-class StartMigrationRequest(BaseModel):
-    sqlite_path: str
-    postgres_url: str
-    batch_size: int = 500
-
-
-# ==============================================
-# RESPONSE MODELS
-# ==============================================
-class StartMigrationResponse(BaseModel):
-    job_id: str
-    status: JobStatus
-    message: str
-
-
-class JobStatusResponse(BaseModel):
-    job_id: str
-    status: JobStatus
-    progress: Optional[float] = None
-    processed_rows: Optional[int] = None
-    total_rows: Optional[int] = None
-    error: Optional[str] = None
-
-
-class JobErrorResponse(BaseModel):
-    job_id: str
-    errors: List[str]
-
-
-# ==============================================
-# INTERNAL DOMAIN MODELS
-# ==============================================
-class TableSchema(BaseModel):
-    name: str
-    columns: Dict[str, str]  # nombre_columna: tipo_sql
-
-
-class MigrationConfig(BaseModel):
-    sqlite_path: str
-    postgres_url: str
-    batch_size: int = 500
-
-
-# ==============================================
-# INTERNAL JOB MANAGEMENT MODEL
-# ==============================================
 class MigrationJob(BaseModel):
     job_id: str
     status: JobStatus = JobStatus.PENDING
-    created_at: datetime = datetime.utcnow()
-    updated_at: datetime = datetime.utcnow()
+
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
     progress: float = 0.0
     processed_rows: int = 0
     total_rows: Optional[int] = None
-    errors: List[str] = []
+
+    errors: List[str] = Field(default_factory=list)
+
+    # -------- Domain behavior (reglas) --------
+    def mark_running(self):
+        self.status = JobStatus.RUNNING
+        self.updated_at = datetime.utcnow()
+
+    def mark_completed(self):
+        self.status = JobStatus.COMPLETED
+        self.progress = 100.0
+        self.updated_at = datetime.utcnow()
+
+    def mark_failed(self, error: str):
+        self.status = JobStatus.FAILED
+        self.errors.append(error)
+        self.updated_at = datetime.utcnow()
+
+    def cancel(self):
+        self.status = JobStatus.CANCELLED
+        self.updated_at = datetime.utcnow()

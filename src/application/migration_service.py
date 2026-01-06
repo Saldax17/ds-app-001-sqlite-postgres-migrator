@@ -1,78 +1,63 @@
 import uuid
 import threading
 
-from src.domain.migrator import Migrator
-from src.domain.models import (
+from src.application.dtos import (
     StartMigrationRequest,
     StartMigrationResponse,
-    MigrationJob,
-    JobStatus,
     JobStatusResponse,
-    JobErrorResponse
+    JobErrorResponse,
 )
-from src.infrastructure.job_manager import JobManager
+from src.application.jobs.job_manager import JobManager
+from src.application.migration.migration_runner import MigrationRunner
+from src.domain.models import MigrationJob
 
 
 class MigrationService:
-
     def __init__(self):
         self.job_manager = JobManager()
 
-    # ==============================================
-    # Start Migration Job (REAL MIGRATOR)
-    # ==============================================
     def start_migration(self, req: StartMigrationRequest) -> StartMigrationResponse:
         job_id = str(uuid.uuid4())
+        job = MigrationJob(job_id=job_id)
 
-        job = MigrationJob(job_id=job_id, status=JobStatus.PENDING)
-        self.job_manager.create_job(job)
+        self.job_manager.create(job)
 
-        # Create migrator instance
-        migrator = Migrator(
-            sqlite_path=req.sqlite_path,
-            postgres_url=req.postgres_url,
-            batch_size=req.batch_size or 1000
+        thread = threading.Thread(
+            target=self._run_async,
+            args=(job_id, req),
+            daemon=True,
         )
+        thread.start()
 
-        # Run migration in background thread
-        t = threading.Thread(target=migrator.run, args=(job_id,), daemon=True)
-        t.start()
-
-        job.status = JobStatus.RUNNING
-        self.job_manager.update_job(job)
+        job.mark_running()
+        self.job_manager.update(job)
 
         return StartMigrationResponse(
             job_id=job_id,
             status=job.status,
-            message="Migration job started successfully."
+            message="Migration job started successfully",
         )
 
-    # ==============================================
-    # Query Job Status
-    # ==============================================
-    def get_job_status(self, job_id: str) -> JobStatusResponse:
-        job = self.job_manager.get_job(job_id)
+    def _run_async(self, job_id: str, req: StartMigrationRequest):
+        runner = MigrationRunner(self.job_manager)
+        runner.run(job_id, req)
 
+    def get_job_status(self, job_id: str) -> JobStatusResponse:
+        job = self.job_manager.get(job_id)
         return JobStatusResponse(
             job_id=job.job_id,
             status=job.status,
             progress=job.progress,
             processed_rows=job.processed_rows,
             total_rows=job.total_rows,
-            error=job.errors[-1] if job.errors else None
+            error=job.errors[-1] if job.errors else None,
         )
 
-    # ==============================================
-    # Get Errors
-    # ==============================================
     def get_job_errors(self, job_id: str) -> JobErrorResponse:
-        job = self.job_manager.get_job(job_id)
+        job = self.job_manager.get(job_id)
         return JobErrorResponse(job_id=job.job_id, errors=job.errors)
 
-    # ==============================================
-    # Cancel Job
-    # ==============================================
     def cancel_job(self, job_id: str):
-        job = self.job_manager.get_job(job_id)
-        job.status = JobStatus.CANCELLED
-        self.job_manager.update_job(job)
+        job = self.job_manager.get(job_id)
+        job.cancel()
+        self.job_manager.update(job)
